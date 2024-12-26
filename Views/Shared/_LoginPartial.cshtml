@@ -1,0 +1,19 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<GESTIONCOMMANDES.Models.Entities.User> SignInManager
+<ul class="navbar-nav ml-auto flex space-x-4">
+@if (SignInManager.IsSignedIn(User))  
+    {
+        <li class="nav-item">
+            <a class="nav-link text-white hover:text-blue-300 transition-colors duration-300" asp-area="" asp-controller="Account" asp-action="Logout">Déconnexion</a>
+        </li>
+    }
+else 
+{
+        <li class="nav-item">
+            <a class="nav-link text-white hover:text-blue-300 transition-colors duration-300" asp-area="" asp-controller="Account" asp-action="Login">Se connecter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white hover:text-blue-300 transition-colors duration-300" asp-area="" asp-controller="Account" asp-action="Register">S'inscrire</a>
+        </li>
+    }
+</ul>

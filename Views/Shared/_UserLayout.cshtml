@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gestion des commandes - Application web" />
+    <title>@ViewBag.Title</title>
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="/css/output.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/GESTIONCOMMANDES.styles.css" asp-append-version="true" />
+</head>
+
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
+
+    <!-- Main Content -->
+    <div class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6 mt-12">
+        <div class="container mx-auto text-center">
+            <p class="text-sm sm:text-base">&copy; 2024 Gestion des Commandes. Tous droits réservés.</p>
+            <p class="mt-2 text-sm sm:text-base">
+                <a href="#" class="text-blue-500 hover:underline">Politique de confidentialité</a> |
+                <a href="#" class="text-blue-500 hover:underline">Conditions d'utilisation</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

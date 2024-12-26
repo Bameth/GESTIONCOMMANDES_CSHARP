@@ -1,0 +1,13 @@
+@model GESTIONCOMMANDES.Models.Entities.Commande
+@{
+    ViewData["Title"] = "Confirmation de Commande";
+}
+
+<h1 class="text-2xl font-bold">Merci pour votre commande !</h1>
+<p>Votre commande a été enregistrée avec succès. Voici les détails :</p>
+<ul>
+    <li><strong>Numéro de commande :</strong> @Model.Id</li>
+    <li><strong>Date :</strong> @Model.Date</li>
+    <li><strong>Montant total :</strong> @Model.MontantTotal.ToString("C")</li>
+</ul>
+<a href="@Url.Action("Index", "Produit")" class="text-blue-600 hover:underline">Retour à la boutique</a>

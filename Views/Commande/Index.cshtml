@@ -1,0 +1,70 @@
+@model IEnumerable<GESTIONCOMMANDES.Models.Entities.Commande>
+
+@{
+    ViewData["Title"] = "Gestion des Commandes";
+}
+
+<div class="bg-gradient-to-br from-indigo-300 min-h-screen py-6">
+    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-3xl p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-5xl font-extrabold text-gray-800 tracking-tight hover:text-indigo-600 transition-all duration-300">
+                Liste des Commandes
+            </h1>
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-4 p-4 bg-green-100 text-green-700 border-l-4 border-green-500 rounded-lg shadow-lg">
+                <i class="fas fa-check-circle mr-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Commands Table -->
+        <div class="overflow-x-auto rounded-3xl shadow-2xl mt-8">
+            <table class="min-w-full table-auto bg-white rounded-lg shadow-md">
+                <thead class="bg-gradient-to-r from-blue-600 to-indigo-800 text-white uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Date Commande</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Montant Total</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Client</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr class="hover:bg-gray-100 transition-all duration-300 ease-in-out odd:bg-gray-50 even:bg-gray-100">
+                                <td class="px-6 py-4">@Html.DisplayFor(modelItem => item.Date)</td>
+                                <td class="px-6 py-4 text-left">@Html.DisplayFor(modelItem => item.MontantTotal)</td>
+                                <td class="px-6 py-4 text-left">@Html.DisplayFor(modelItem => item.Client.Nom)</td>
+                                <td class="px-6 py-4 flex space-x-4">
+                                <a href="@Url.Action("Details", "Commande", new { id = item.Id })"
+                                    class="text-blue-600 hover:text-blue-800 transition-colors duration-300">
+                                    <i class="fas fa-share"></i>
+                                </a>
+                                <button class="text-red-600 hover:text-red-800 transition-colors duration-300"
+                                    data-toggle="modal" data-target="#deleteModal">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-6 text-gray-500">
+                                Vous n'avez pas de commande
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

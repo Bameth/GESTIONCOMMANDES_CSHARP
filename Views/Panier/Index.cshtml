@@ -1,0 +1,112 @@
+@model IList<GESTIONCOMMANDES.Models.Entities.LignePanier>
+@{
+    ViewData["Title"] = "Panier";
+    Layout = "_Layout";
+}
+<section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+    <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <!-- Titre principal -->
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl flex items-center gap-3">
+            <i class="fas fa-shopping-cart text-red-600"></i> Votre Panier
+        </h2>
+
+        @if (Model.Any())
+        {
+            <div class="mt-8 sm:mt-10 md:gap-6 lg:flex lg:items-start xl:gap-8">
+                <!-- Liste des articles -->
+                <div class="mx-auto w-full lg:max-w-2xl xl:max-w-4xl space-y-6">
+                    @foreach (var item in Model)
+                    {
+                        <div class="rounded-lg border border-gray-300 bg-white p-4 shadow-md dark:border-gray-700 dark:bg-gray-800 md:p-6 transition-all hover:shadow-lg">
+                            <div class="md:flex md:items-center md:gap-6">
+                                <!-- Image produit -->
+                                <a href="#" class="w-20 shrink-0">
+                                    <img class="h-20 w-20 object-cover rounded-md shadow-md hover:scale-105 transition-transform duration-300 ease-in-out" src="/produits/@item.Produit.ImageFileName" alt="@item.Produit.Libelle" />
+                                </a>
+
+                                <!-- Détails produit -->
+                                <div class="w-full min-w-0 flex-1 space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                            @item.Produit.Libelle
+                                        </h3>
+                                        <p class="text-base font-bold text-gray-900 dark:text-white">
+                                            @item.Montant().ToString("C")
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <!-- Formulaire pour diminuer la quantité -->
+                                        <form asp-action="ModifierQuantite" method="post" class="inline-block">
+                                            <input type="hidden" name="ligneId" value="@item.Id" />
+                                            <input type="hidden" name="increment" value="-1" />
+                                            <button type="submit" class="h-10 w-10 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none flex items-center justify-center">
+                                                @if (item.Quantite == 1)
+                                                {
+                                                    <i class="fas fa-trash text-red-600"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-minus text-gray-600"></i>
+                                                }
+                                            </button>
+                                        </form>
+
+                                        <!-- Affichage de la quantité -->
+                                        <input type="text" class="w-16 text-center border-0 bg-transparent text-sm font-medium text-gray-900 focus:outline-none dark:text-white" value="@item.Quantite" readonly />
+
+                                        <!-- Formulaire pour augmenter la quantité -->
+                                        <form asp-action="ModifierQuantite" method="post" class="inline-block">
+                                            <input type="hidden" name="ligneId" value="@item.Id" />
+                                            <input type="hidden" name="increment" value="1" />
+                                            <button type="submit" class="h-10 w-10 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none flex items-center justify-center">
+                                                <i class="fas fa-plus text-gray-600 dark:text-white"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        Prix unitaire : <span class="text-gray-900 dark:text-white">@item.Produit.Prix.ToString("C")</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Résumé du panier -->
+                <div class="mt-8 w-full lg:max-w-md">
+                    <div class="rounded-lg border border-gray-300 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-800 transition-all hover:shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Résumé de la commande</h3>
+                        <div class="flex justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Sous-total :</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">@ViewBag.Total.ToString("C")</span>
+                        </div>
+                        <div class="flex justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Frais de livraison :</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">Gratuit</span>
+                        </div>
+                        <hr class="my-4 border-gray-200 dark:border-gray-700" />
+                        <div class="flex justify-between mb-6">
+                            <span class="text-base font-medium text-gray-900 dark:text-white">Total :</span>
+                            <span class="text-base font-bold text-red-600 dark:text-red-400">@ViewBag.Total.ToString("C")</span>
+                        </div>
+                        <a href="@Url.Action("PasserCommande", "Commande")" class="w-full inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600">
+                            <i class="fas fa-arrow-right mr-2"></i> Passer à la commande
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Panier vide -->
+            <div class="text-center py-12">
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-white">
+                    <i class="fas fa-box-open text-gray-500"></i> Votre panier est vide
+                </h3>
+                <a href="@Url.Action("Index", "Produit")" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">
+                    <i class="fas fa-shopping-bag mr-2"></i> Parcourir les produits
+                </a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,25 @@
+@model IEnumerable<GESTIONCOMMANDES.Models.Entities.Produit>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Liste des Produits";
+}
+
+<div class="container mx-auto py-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    @foreach (var produit in Model)
+    {   
+    <div class="bg-gray-100 rounded-lg shadow-lg p-4">
+      <!-- Lien vers les détails du produit -->
+      <a href="@Url.Action("Details", "Produit", new { id = produit.Id })" class="relative block">
+        <img src="/produits/@produit.ImageFileName" alt="Product" class="rounded-lg w-full">
+        <span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">-40%</span>
+      </a>
+      <h2 class="text-sm font-medium text-gray-800 mt-4">@produit.Libelle</h2>
+      <div class="mt-2">
+        <span class="text-red-600 font-bold text-lg">@produit.Prix.ToString("C")</span>
+        <span class="text-gray-400 line-through text-sm ml-2">CFA 115,300</span>
+      </div>
+    </div>
+    }
+  </div>
+</div>

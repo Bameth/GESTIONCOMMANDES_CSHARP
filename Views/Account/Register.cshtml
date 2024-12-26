@@ -1,0 +1,98 @@
+@using GESTIONCOMMANDES.Models.Entities;
+@model RegisterViewModel;
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-100 via-blue-200 to-green-200">
+    <div class="bg-white shadow-2xl rounded-2xl p-10 max-w-4xl w-full">
+        <h2 class="text-4xl font-extrabold text-gray-800 text-center mb-8">Créer un compte</h2>
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 mb-6"></div>
+
+            <!-- Nom & Prénom -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                <div class="mb-6">
+                    <label asp-for="Nom" class="block text-lg font-semibold text-gray-800 mb-2">Nom</label>
+                    <div class="relative">
+                        <input type="text" name="Nom" id="Nom" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="Nom" placeholder="Entrez votre nom" />
+                        <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="Nom" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div class="mb-6">
+                    <label asp-for="Prenom" class="block text-lg font-semibold text-gray-800 mb-2">Prénom</label>
+                    <div class="relative">
+                        <input type="text" name="Prenom" id="Prenom" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="Prenom" placeholder="Entrez votre prénom" />
+                        <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="Prenom" class="text-red-500 text-sm"></span>
+                </div>
+            </div>
+
+            <!-- Email & Téléphone -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                <div class="mb-6">
+                    <label asp-for="Email" class="block text-lg font-semibold text-gray-800 mb-2">Email</label>
+                    <div class="relative">
+                        <input type="text" name="Email" id="Email" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="Email" placeholder="Entrez votre email" />
+                        <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div class="mb-6">
+                    <label asp-for="PhoneNumber" class="block text-lg font-semibold text-gray-800 mb-2">Téléphone</label>
+                    <div class="relative">
+                        <input type="text" name="PhoneNumber" id="PhoneNumber" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="PhoneNumber" placeholder="Entrez votre numéro de téléphone" />
+                        <i class="fas fa-phone-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="text-red-500 text-sm"></span>
+                </div>
+            </div>
+
+            <!-- Adresse -->
+            <div class="mb-8">
+                <label asp-for="Adresse" class="block text-lg font-semibold text-gray-800 mb-2">Adresse</label>
+                <div class="relative">
+                    <input type="text" name="Adresse" id="Adresse" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="Adresse" placeholder="Entrez votre adresse" />
+                    <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                </div>
+                <span asp-validation-for="Adresse" class="text-red-500 text-sm"></span>
+            </div>
+
+            <!-- Mot de Passe & Confirmer -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                <div class="mb-6">
+                    <label asp-for="Password" class="block text-lg font-semibold text-gray-800 mb-2">Mot de passe</label>
+                    <div class="relative">
+                        <input type="password" name="Password" id="Password" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="Password" placeholder="Entrez votre mot de passe" />
+                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div class="mb-6">
+                    <label asp-for="ConfirmPassword" class="block text-lg font-semibold text-gray-800 mb-2">Confirmer le mot de passe</label>
+                    <div class="relative">
+                        <input type="password" name="ConfirmPassword" id="ConfirmPassword" class="w-full p-4 pl-12 focus:ring-2 focus:ring-indigo-500 border-2 border-gray-300 rounded-xl transition-all duration-300 placeholder-gray-400 focus:border-indigo-500" asp-for="ConfirmPassword" placeholder="Confirmez votre mot de passe" />
+                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-red-500 text-sm"></span>
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition duration-200 ease-in-out transform hover:scale-105">
+                Créer un compte
+            </button>
+
+            <!-- Already have an account -->
+            <p class="text-center text-lg text-gray-600 mt-6">
+                Vous avez déjà un compte? <a asp-controller="Account" asp-action="Login" class="text-indigo-600 hover:underline">Se connecter</a>
+            </p>
+        </form>
+    </div>
+</div>

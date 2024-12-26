@@ -1,0 +1,105 @@
+@model GESTIONCOMMANDES.Models.Entities.Commande
+@using GESTIONCOMMANDES.Models.Entities
+
+@{
+    ViewData["Title"] = "Détails de la Commande";
+}
+
+<div class="bg-gradient-to-br from-indigo-300 min-h-screen py-6">
+    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-3xl p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
+                Détails de la Commande #@Model.Id
+            </h1>
+        </div>
+
+        <!-- Command Details -->
+        <div class="bg-gray-100 p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-gray-800">Informations de la Commande</h2>
+            <div class="mt-4 space-y-4">
+                <div>
+                    <strong class="text-gray-600">Date de Commande:</strong>
+                    <p class="text-lg text-gray-800">@Model.Date.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">Montant Total:</strong>
+                    <p class="text-lg text-gray-800">@Model.MontantTotal.ToString("C")</p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">Client:</strong>
+                    <p class="text-lg text-gray-800">@Model.Client.Prenom</p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">État de la Commande:</strong>
+                    <p class="text-lg text-gray-800">@Model.EtatCommande</p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">Livreur:</strong>
+                    <p class="text-lg text-gray-800">
+                        @(Model.Livraison?.Livreur?.Nom ?? "Non attribué")
+                    </p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">Adresse:</strong>
+                    <p class="text-lg text-gray-800">
+                        @(Model.Livraison?.Adresse ?? "Non attribué")
+                    </p>
+                </div>
+                <div>
+                    <strong class="text-gray-600">Date de Livraison:</strong>
+                    <p class="text-lg text-gray-800">
+                        @(Model.Livraison != null ? Model.Livraison.DateLivraison.ToString("dd/MM/yyyy HH:mm") : "Non planifiée")
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attribuer un Livreur et Planifier la Livraison -->
+        <div class="mt-8 flex justify-end">
+            <button
+                class="bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
+                onclick="openLivraisonModal()">Attribuer un Livreur et Planifier la Livraison</button>
+        </div>
+
+        <!-- Modal pour attribuer un livreur et une date de livraison -->
+        <div id="livraisonModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 class="text-2xl font-semibold text-gray-800">Planifier la Livraison</h2>
+<form asp-route-commandeId="@Model.Id" method="post" asp-controller="Commande" asp-action="PlanifierLivraison">
+    <input type="hidden" name="commandeId" value="@Model.Id" />
+    <div class="mt-4">
+        <label for="LivreurId" class="block text-gray-700">Livreur</label>
+        <select name="livreurId" id="LivreurId" class="form-select mt-2 w-full">
+            @foreach (var livreur in (List<Livreur>)ViewData["Livreurs"])
+            {
+                <option value="@livreur.Id">@livreur.Nom</option>
+            }
+        </select>
+    </div>
+    <div class="mt-4">
+        <label for="DateLivraison" class="block text-gray-700">Date de Livraison</label>
+        <input type="datetime-local" name="dateLivraison" id="DateLivraison" class="form-input mt-2 w-full" required />
+    </div>
+    <div class="mt-4">
+        <label for="adresse" class="block text-gray-700">Adresse</label>
+        <input type="text" name="adresse" id="adresse" class="form-input mt-2 w-full" required />
+    </div>
+    <div class="mt-6 flex justify-end">
+        <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Planifier</button>
+        <button type="button" class="ml-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onclick="closeLivraisonModal()">Annuler</button>
+    </div>
+</form>
+
+            </div>
+        </div>
+
+        <script>
+            function openLivraisonModal() {
+                document.getElementById("livraisonModal").classList.remove("hidden");
+            }
+
+            function closeLivraisonModal() {
+                document.getElementById("livraisonModal").classList.add("hidden");
+            }
+        </script>
