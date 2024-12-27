@@ -21,19 +21,19 @@ namespace GESTIONCOMMANDES.Controllers
         // GET: Commande
         public async Task<IActionResult> Index()
         {
-            var userName = User.Identity?.Name; // Récupère le nom de l'utilisateur connecté
+            var userName = User.Identity?.Name;
             if (string.IsNullOrEmpty(userName))
             {
-                return Unauthorized(); // Si l'utilisateur n'est pas connecté, on bloque l'accès
+                return Unauthorized();
             }
 
-            // Récupère le rôle de l'utilisateur connecté
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == userName);
 
             if (user == null)
             {
-                return Unauthorized(); // Si l'utilisateur n'est pas trouvé, bloquer l'accès
+                return Unauthorized();
             }
 
             IQueryable<Commande> commandesQuery = _context.Commandes;
@@ -41,13 +41,12 @@ namespace GESTIONCOMMANDES.Controllers
             // Si l'utilisateur est un RS, on récupère toutes les commandes
             if (user.Role == Role.RS)
             {
-                commandesQuery = commandesQuery.Include(c => c.Client); // Inclure les informations du client
+                commandesQuery = commandesQuery.Include(c => c.Client);
             }
             else
             {
-                // Sinon, on filtre les commandes par l'utilisateur connecté
                 commandesQuery = commandesQuery
-                    .Include(c => c.Client) // Inclure les informations du client
+                    .Include(c => c.Client)
                     .Where(c => c.Client.User.UserName == userName);
             }
 
