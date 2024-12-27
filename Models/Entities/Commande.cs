@@ -13,8 +13,8 @@ namespace GESTIONCOMMANDES.Models.Entities
         public List<DetailCommande>? DetailsCommandes { get; set; }
         public Livraison? Livraison { get; set; }
         public StatutCommande EtatCommande { get; set; }
-        public Paiement Paiement { get; set; }
-        [NotMapped]
-        public bool IsPaye => Paiement.TypePaiement == TypePaiement.CHEQUE || Paiement.TypePaiement == TypePaiement.ESPECES || Paiement.TypePaiement == TypePaiement.OM || Paiement.TypePaiement == TypePaiement.WAVE;
+        public Paiement? Paiement { get; set; }
+        public StatutPaiement? StatutPaiement { get; set; }
+
     }
 }

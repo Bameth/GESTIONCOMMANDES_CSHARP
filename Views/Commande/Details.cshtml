@@ -1,23 +1,28 @@
 @model GESTIONCOMMANDES.Models.Entities.Commande
 @using GESTIONCOMMANDES.Models.Entities
+@using Microsoft.EntityFrameworkCore
+@using GESTIONCOMMANDES.enums
+@inject GESTIONCOMMANDES.data.AppDbContext _context
 
 @{
     ViewData["Title"] = "Détails de la Commande";
+    var userName = User.Identity?.Name;
+    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 }
 
-<div class="bg-gradient-to-br from-indigo-300 min-h-screen py-6">
-    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-3xl p-8">
+<div class="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 min-h-screen py-12">
+    <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-3xl p-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">
                 Détails de la Commande #@Model.Id
             </h1>
         </div>
 
         <!-- Command Details -->
-        <div class="bg-gray-100 p-6 rounded-xl shadow-lg">
-            <h2 class="text-2xl font-semibold text-gray-800">Informations de la Commande</h2>
-            <div class="mt-4 space-y-4">
+        <div class="bg-gray-50 p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Informations de la Commande</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <strong class="text-gray-600">Date de Commande:</strong>
                     <p class="text-lg text-gray-800">@Model.Date.ToString("dd/MM/yyyy HH:mm")</p>
@@ -52,54 +57,192 @@
                         @(Model.Livraison != null ? Model.Livraison.DateLivraison.ToString("dd/MM/yyyy HH:mm") : "Non planifiée")
                     </p>
                 </div>
+                <div>
+                    <strong class="text-gray-600">Paiement:</strong>
+                </div>
             </div>
         </div>
 
         <!-- Attribuer un Livreur et Planifier la Livraison -->
-        <div class="mt-8 flex justify-end">
-            <button
-                class="bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
-                onclick="openLivraisonModal()">Attribuer un Livreur et Planifier la Livraison</button>
-        </div>
+        @if (user.Role == Role.RS)
+        {
+            <div class="mt-8 flex justify-end">
+                <button
+                    class="bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
+                    onclick="openLivraisonModal()">Attribuer un Livreur et Planifier la Livraison</button>
+            </div>
+        }
 
         <!-- Modal pour attribuer un livreur et une date de livraison -->
         <div id="livraisonModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
             <div class="bg-white p-6 rounded-lg shadow-lg w-96">
                 <h2 class="text-2xl font-semibold text-gray-800">Planifier la Livraison</h2>
-<form asp-route-commandeId="@Model.Id" method="post" asp-controller="Commande" asp-action="PlanifierLivraison">
-    <input type="hidden" name="commandeId" value="@Model.Id" />
-    <div class="mt-4">
-        <label for="LivreurId" class="block text-gray-700">Livreur</label>
-        <select name="livreurId" id="LivreurId" class="form-select mt-2 w-full">
-            @foreach (var livreur in (List<Livreur>)ViewData["Livreurs"])
-            {
-                <option value="@livreur.Id">@livreur.Nom</option>
-            }
-        </select>
-    </div>
-    <div class="mt-4">
-        <label for="DateLivraison" class="block text-gray-700">Date de Livraison</label>
-        <input type="datetime-local" name="dateLivraison" id="DateLivraison" class="form-input mt-2 w-full" required />
-    </div>
-    <div class="mt-4">
-        <label for="adresse" class="block text-gray-700">Adresse</label>
-        <input type="text" name="adresse" id="adresse" class="form-input mt-2 w-full" required />
-    </div>
-    <div class="mt-6 flex justify-end">
-        <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Planifier</button>
-        <button type="button" class="ml-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onclick="closeLivraisonModal()">Annuler</button>
-    </div>
-</form>
-
+                <form asp-route-commandeId="@Model.Id" method="post" asp-controller="Commande" asp-action="PlanifierLivraison">
+                    <input type="hidden" name="commandeId" value="@Model.Id" />
+                    <div class="mt-4">
+                        <label for="LivreurId" class="block text-gray-700">Livreur</label>
+                        <select name="livreurId" id="LivreurId" class="form-select mt-2 w-full">
+                            @foreach (var livreur in (List<Livreur>)ViewData["Livreurs"])
+                            {
+                                <option value="@livreur.Id">@livreur.Nom</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mt-4">
+                        <label for="DateLivraison" class="block text-gray-700">Date de Livraison</label>
+                        <input type="datetime-local" name="dateLivraison" id="DateLivraison" class="form-input mt-2 w-full" required />
+                    </div>
+                    <div class="mt-4">
+                        <label for="adresse" class="block text-gray-700">Adresse</label>
+                        <input type="text" name="adresse" id="adresse" class="form-input mt-2 w-full" required />
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Planifier</button>
+                        <button type="button" class="ml-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" onclick="closeLivraisonModal()">Annuler</button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <script>
-            function openLivraisonModal() {
-                document.getElementById("livraisonModal").classList.remove("hidden");
-            }
+        <!-- Paiement Button for Client -->
+        @if (user.Role == Role.CLIENT)
+        {
+            <div class="mt-8 flex justify-end">
+                <button
+                    class="bg-indigo-600 text-white py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
+                    onclick="openPaiementModal()">Procéder au Paiement</button>
+            </div>
+        }
 
-            function closeLivraisonModal() {
-                document.getElementById("livraisonModal").classList.add("hidden");
-            }
-        </script>
+        <!-- Modal for Payment -->
+        <div id="paiementModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+            <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-lg animate__animated animate__fadeIn">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Choisissez votre Mode de Paiement</h2>
+
+                <!-- Order Summary -->
+                <div class="mb-6">
+                    <strong class="text-gray-600">Montant Total:</strong>
+                    <p class="text-xl text-gray-800 font-semibold">@Model.MontantTotal.ToString("C")</p>
+                </div>
+
+                <!-- Payment Methods Selection -->
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="text-center p-6 border border-gray-300 rounded-2xl cursor-pointer hover:shadow-xl transform transition-all duration-200"
+                         onclick="selectPaymentMethod('OM')">
+                        <img src="~/images/OM.png" alt="Orange Money" class="w-16 mx-auto mb-4" />
+                        <p class="text-lg text-gray-700">Orange Money</p>
+                    </div>
+                    <div class="text-center p-6 border border-gray-300 rounded-2xl cursor-pointer hover:shadow-xl transform transition-all duration-200"
+                         onclick="selectPaymentMethod('WAVE')">
+                        <img src="~/images/wave.png" alt="Wave" class="w-16 mx-auto mb-4" />
+                        <p class="text-lg text-gray-700">Wave</p>
+                    </div>
+                    <div class="text-center p-6 border border-gray-300 rounded-2xl cursor-pointer hover:shadow-xl transform transition-all duration-200"
+                         onclick="selectPaymentMethod('ESPECES')">
+                        <img src="~/images/espece.png" alt="Espèces" class="w-16 mx-auto mb-4" />
+                        <p class="text-lg text-gray-700">Espèces</p>
+                    </div>
+                </div>
+
+                <!-- Payment Forms -->
+                <form asp-action="Paiement" asp-controller="Commande" method="post" onsubmit="return validatePaymentSelection()">
+                    <input type="hidden" name="commandeId" value="@Model.Id" />
+                    <input type="hidden" id="selectedPaymentType" name="typePaiement" />
+                    <input type="hidden" name="reference" id="reference" />
+
+                    <!-- Affichez les formulaires en fonction du mode de paiement sélectionné -->
+                    <div id="omForm" class="hidden mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Orange Money</h3>
+                        <div class="mt-4">
+                            <label for="numOM" class="block text-gray-700">Numéro Orange Money</label>
+                            <input type="text" id="numOM" name="numOM" class="form-input mt-2 w-full" required />
+                        </div>
+                    </div>
+
+                    <div id="waveForm" class="hidden mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Wave</h3>
+                        <div class="mt-4">
+                            <label for="numWave" class="block text-gray-700">Numéro Wave</label>
+                            <input type="text" id="numWave" name="numWave" class="form-input mt-2 w-full" required />
+                        </div>
+                    </div>
+
+                    <div id="espForm" class="hidden mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Espèces</h3>
+                        <div class="mt-4">
+                            <label for="montantEsp" class="block text-gray-700">Montant</label>
+                            <input type="number" id="montantEsp" name="montantEsp" class="form-input mt-2 w-full" required />
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" id="submitPaymentButton" class="bg-green-600 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-700 transition duration-300">Confirmer le Paiement</button>
+                        <button type="button" class="ml-4 bg-gray-600 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-gray-700" onclick="closePaiementModal()">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openPaiementModal() {
+            document.getElementById('paiementModal').classList.remove('hidden');
+        }
+
+        function closePaiementModal() {
+            document.getElementById('paiementModal').classList.add('hidden');
+        }
+
+       function selectPaymentMethod(paymentType) {
+    document.getElementById('selectedPaymentType').value = paymentType;
+document.getElementById('reference').value = document.getElementById('numOM').value;  // Exemple pour OM
+
+    // Masque tous les formulaires de paiement
+    document.getElementById('omForm').classList.add('hidden');
+    document.getElementById('waveForm').classList.add('hidden');
+    document.getElementById('espForm').classList.add('hidden');
+
+    // Masquer tous les champs de référence
+    document.getElementById('numOM').required = false;
+    document.getElementById('numWave').required = false;
+    document.getElementById('montantEsp').required = false;
+
+    if (paymentType === 'OM') {
+        document.getElementById('omForm').classList.remove('hidden');
+        document.getElementById('numOM').required = true;
+    } else if (paymentType === 'WAVE') {
+        document.getElementById('waveForm').classList.remove('hidden');
+        document.getElementById('numWave').required = true;
+    } else if (paymentType === 'ESPECES') {
+        document.getElementById('espForm').classList.remove('hidden');
+        document.getElementById('montantEsp').required = true;
+    }
+}
+
+function validatePaymentSelection() {
+    const selectedPaymentType = document.getElementById('selectedPaymentType').value;
+    if (!selectedPaymentType) {
+        alert("Veuillez sélectionner un mode de paiement");
+        return false;
+    }
+
+    // Log pour déboguer
+    console.log('Type de paiement sélectionné:', selectedPaymentType);
+    console.log('Référence:', document.getElementById('reference').value);
+
+    return true;
+}
+
+
+
+        function openLivraisonModal() {
+            document.getElementById('livraisonModal').classList.remove('hidden');
+        }
+
+        function closeLivraisonModal() {
+            document.getElementById('livraisonModal').classList.add('hidden');
+        }
+    </script>
+}

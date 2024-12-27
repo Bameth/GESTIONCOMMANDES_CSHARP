@@ -150,6 +150,46 @@ namespace GESTIONCOMMANDES.Controllers
                 return RedirectToAction("Details", new { id = commandeId });
             }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Paiement(int commandeId, TypePaiement typePaiement, string reference)
+        {
+            try
+            {
+                var commande = await _context.Commandes
+                    .FirstOrDefaultAsync(c => c.Id == commandeId);
+
+                if (commande == null)
+                {
+                    TempData["ErrorMessage"] = "Commande introuvable.";
+                    return RedirectToAction(nameof(Details), new { id = commandeId });
+                }
+
+                // Mettez à jour l'état de la commande en fonction du type de paiement
+                commande.EtatCommande = StatutCommande.LIVREE;
+                commande.StatutPaiement = StatutPaiement.PAYEE;
+
+                // Enregistrez les informations du paiement (référence et mode)
+                var paiement = new Paiement
+                {
+                    CommandeId = commande.Id,
+                    TypePaiement = typePaiement,
+                    Reference = reference,  // Vérifiez que la référence est correctement récupérée
+                    Date = DateTime.UtcNow
+                };
+
+                _context.Paiements.Add(paiement);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Paiement effectué avec succès.";
+                return RedirectToAction(nameof(Details), new { id = commandeId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Une erreur s'est produite : {ex.Message}";
+                return RedirectToAction(nameof(Details), new { id = commandeId });
+            }
+        }
 
         // GET: Commande/Edit/5
         public async Task<IActionResult> Edit(int? id)

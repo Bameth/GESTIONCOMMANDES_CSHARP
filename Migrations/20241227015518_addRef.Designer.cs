@@ -3,6 +3,7 @@ using System;
 using GESTIONCOMMANDES.data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GESTIONCOMMANDES.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227015518_addRef")]
+    partial class addRef
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,9 +92,6 @@ namespace GESTIONCOMMANDES.Migrations
 
                     b.Property<decimal>("MontantTotal")
                         .HasColumnType("numeric");
-
-                    b.Property<int?>("StatutPaiement")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("timestamp with time zone")
@@ -676,7 +676,8 @@ namespace GESTIONCOMMANDES.Migrations
 
                     b.Navigation("Livraison");
 
-                    b.Navigation("Paiement");
+                    b.Navigation("Paiement")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GESTIONCOMMANDES.Models.Entities.Livreur", b =>

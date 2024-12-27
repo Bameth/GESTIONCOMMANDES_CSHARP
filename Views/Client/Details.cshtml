@@ -88,17 +88,25 @@
                                 <td class="px-6 py-3 text-center">@commande.Date.ToString("dd/MM/yyyy")</td>
                                 <td class="px-6 py-3 text-center">@commande.MontantTotal.ToString("C")</td>
                                 <td class="px-6 py-3 text-center">
-                                    @if (commande.Paiement != null && commande.IsPaye)
+                                    @if (commande.StatutPaiement != null)
                                     {
-                                        <i class="fas fa-check-circle text-green-500"></i> <span
-                                            class="text-green-500">Payée</span>
+                                        @switch (commande.StatutPaiement)
+                                        {
+                                            case GESTIONCOMMANDES.enums.StatutPaiement.PAYEE:
+                                                <span class="text-green-500 font-semibold">Payée</span>
+                                                break;
+                                            default:
+                                                <span class="text-gray-500">Statut inconnu</span>
+                                                break;
+                                        }
                                     }
                                     else
                                     {
-                                        <i class="fas fa-times-circle text-red-500"></i> <span class="text-red-500">Non
-                                            Payée</span>
+                                        <span class="text-red-500 font-semibold">Non payée</span>
+
                                     }
                                 </td>
+
                                 <td class="px-6 py-3 text-center">
                                     @if (commande.Livraison != null)
                                     {
@@ -113,21 +121,21 @@
                                 <td class="px-6 py-3 text-center">
                                     @switch (commande.EtatCommande)
                                     {
-                                        case GESTIONCOMMANDES.enums.StatutCommande.PRET_A_LIVRER:
+                                        case GESTIONCOMMANDES.enums.StatutCommande.LIVREE:
                                             <i class="fas fa-truck-loading text-green-500"></i> <span
-                                                class="text-green-500 font-semibold">EN cours de Livraison</span>
+                                                class="text-green-500 font-semibold">LIVREE</span>
                                             break;
-                                        case GESTIONCOMMANDES.enums.StatutCommande.ENCOURS:
+                                        case GESTIONCOMMANDES.enums.StatutCommande.PRET_A_LIVRER:
                                             <i class="fas fa-spinner text-yellow-500 animate-spin"></i> <span
-                                                class="text-yellow-500 font-semibold">En cours</span>
+                                                class="text-yellow-500 font-semibold">En cours Livraison</span>
                                             break;
                                         case GESTIONCOMMANDES.enums.StatutCommande.ANNULEE:
                                             <i class="fas fa-ban text-red-500"></i> <span
                                                 class="text-red-500 font-semibold">Annulée</span>
                                             break;
                                         case GESTIONCOMMANDES.enums.StatutCommande.ENATTENTE:
-                                            <i class="fas fa-ban text-red-500"></i> <span
-                                                class="text-red-500 font-semibold">EN ATTENTE</span>
+                                            <i class="fas fa-ban text-red-500"></i> <span class="text-red-500 font-semibold">EN
+                                                ATTENTE</span>
                                             break;
                                     }
                                 </td>
