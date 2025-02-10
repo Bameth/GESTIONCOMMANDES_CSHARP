@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:80"  # Le conteneur expose le port 80, accessible via le port 5000 de votre machine
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # La chaîne de connexion : notez que "Host=db" correspond au service PostgreSQL défini ci-dessous
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=gestion_commandes_csharp;Username=postgres;Password=Rd5jm7qshp;
+
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: gestion_commandes_csharp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Rd5jm7qshp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

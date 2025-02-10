@@ -1,46 +1,65 @@
 @model GESTIONCOMMANDES.Models.Entities.Produit
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Modifier Produit";
 }
 
-<h1>Edit</h1>
+<div class="container mx-auto p-6">
+    <div class="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-2xl rounded-lg p-8 max-w-lg mx-auto mt-10">
+        <h1 class="text-4xl font-extrabold text-white text-center mb-6 animate__animated animate__fadeIn">Modifier un Produit</h1>
 
-<h4>Produit</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
         <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Libelle" class="control-label"></label>
-                <input asp-for="Libelle" class="form-control" />
-                <span asp-validation-for="Libelle" class="text-danger"></span>
+
+            <!-- Libelle -->
+            <div class="form-group mb-6">
+                <label asp-for="Libelle" class="block text-lg font-semibold text-white">Libelle</label>
+                <input asp-for="Libelle" class="w-full p-3 rounded-md bg-white bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black placeholder-gray-500 transition-all ease-in-out" />
+                <span asp-validation-for="Libelle" class="text-red-300 mt-2"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Prix" class="control-label"></label>
-                <input asp-for="Prix" class="form-control" />
-                <span asp-validation-for="Prix" class="text-danger"></span>
+
+            <!-- Prix -->
+            <div class="form-group mb-6">
+                <label asp-for="Prix" class="block text-lg font-semibold text-white">Prix</label>
+                <input asp-for="Prix" class="w-full p-3 rounded-md bg-white bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black placeholder-gray-500 transition-all ease-in-out" />
+                <span asp-validation-for="Prix" class="text-red-300 mt-2"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="QteStock" class="control-label"></label>
-                <input asp-for="QteStock" class="form-control" />
-                <span asp-validation-for="QteStock" class="text-danger"></span>
+
+            <!-- Quantité en Stock -->
+            <div class="form-group mb-6">
+                <label asp-for="QteStock" class="block text-lg font-semibold text-white">Quantité en Stock</label>
+                <input asp-for="QteStock" class="w-full p-3 rounded-md bg-white bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black placeholder-gray-500 transition-all ease-in-out" />
+                <span asp-validation-for="QteStock" class="text-red-300 mt-2"></span>
             </div>
-            <div class="form-group">
-                <label for="ImageFile">Modifier l'Image</label>
-                <input type="file" name="ImageFile" class="form-control" />
-                <img src="@Url.Content($"~/{Model.ImageFileName}")" alt="Image du produit"
-                    style="max-width: 150px; max-height: 150px;" />
+
+            <!-- Image -->
+            <div class="form-group mb-6">
+                <label for="ImageFile" class="block text-lg font-semibold text-white">Modifier l'Image</label>
+                <input type="file" name="ImageFile" class="w-full p-3 rounded-md bg-white bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black placeholder-gray-500 transition-all ease-in-out" />
+                @if (!string.IsNullOrEmpty(Model.ImageFileName))
+                {
+                    <img src="@Url.Content($"~/{Model.ImageFileName}")" alt="Image du produit" class="max-w-xs mt-4" />
+                }
             </div>
+
+            <!-- Autres images -->
+            <div class="form-group mb-6">
+                <label for="AdditionalImages" class="block text-lg font-semibold text-white">Autres images</label>
+                <input id="AdditionalImages" name="AdditionalImages"
+                       class="w-full p-3 rounded-md bg-white bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black placeholder-gray-500 transition-all ease-in-out"
+                       type="file" multiple />
+                <p class="text-red-300 mt-1" id="imageLimitWarning" style="display: none;">Vous ne pouvez télécharger que 4 images miniatures maximum.</p>
+            </div>
+
+            <!-- Bouton de soumission -->
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg shadow-lg transition duration-150 ease-in-out transform hover:scale-105 mt-6">Enregistrer</button>
             </div>
         </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div class="mt-4">
+            <a href="@Url.Action("Index")" class="text-white hover:underline">Retour à la liste</a>
+        </div>
+    </div>
 </div>

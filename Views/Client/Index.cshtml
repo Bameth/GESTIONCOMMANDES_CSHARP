@@ -1,15 +1,15 @@
 @model PaginationViewModel
 @{
     Layout = "_Layout";
-}
-@{
     ViewData["Title"] = "Gestion des Clients";
 }
 
-<div class="bg-gradient-to-br from-indigo-200 to-blue-300 min-h-screen py-6">
+<div class="bg-white">
     <div class="max-w-7xl mx-auto bg-white shadow-2xl rounded-3xl p-8">
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight hover:text-indigo-600 transition-all">Liste des Clients</h1>
+            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight hover:text-indigo-600 transition-all">
+                Liste des Clients
+            </h1>
         </div>
 
         <form method="get" action="@Url.Action("Index", "Client")" class="flex items-center bg-gray-100 p-4 rounded-lg shadow-inner space-x-4 mb-8">
@@ -25,7 +25,7 @@
 
             <div class="flex-grow">
                 <div class="relative">
-                    <input type="text" name="prenom" placeholder="Rechercher par prenom..."
+                    <input type="text" name="prenom" placeholder="Rechercher par prénom..."
                         class="border border-gray-300 rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full transition-all" />
                     <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                         <i class="fas fa-user mt-2"></i>
@@ -70,7 +70,6 @@
                             </td>
                         </tr>
                     }
-                   
                 </tbody>
             </table>
         </div>

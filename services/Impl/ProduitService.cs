@@ -25,7 +25,7 @@ namespace GESTIONCOMMANDES.services.Impl
             return await _context.Produits.ToListAsync();
         }
 
-        public async Task<(List<Produit> Produits, int TotalPages)> GetProduitsAsync(string libelle, int page = 1, int pageSize = 4)
+        public async Task<(List<Produit> Produits, int TotalPages)> GetProduitsAsync(string libelle, int page = 1, int pageSize = 6)
         {
             var query = _context.Produits.AsQueryable();
 

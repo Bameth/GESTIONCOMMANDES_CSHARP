@@ -47,7 +47,7 @@ namespace GESTIONCOMMANDES.Controllers
             {
                 commandesQuery = commandesQuery
                     .Include(c => c.Client)
-                    .Where(c => c.Client.User.UserName == userName);
+                    .Where(c => c.Client != null && c.Client.User != null && c.Client.User.UserName == userName);
             }
 
             return View(await commandesQuery.ToListAsync());
@@ -106,9 +106,11 @@ namespace GESTIONCOMMANDES.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlanifierLivraison(int? commandeId, int? livreurId, DateTime dateLivraison, string adresse)
+        public async Task<IActionResult> PlanifierLivraison(int? commandeId, int? livreurId, DateTime dateLivraison, string? adresse)
         {
-            System.Console.WriteLine("CommandeId: " + commandeId + ", LivreurId: " + livreurId + ", DateLivraison: " + dateLivraison);
+            Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
+            Console.WriteLine("CommandeId: " + commandeId + ", LivreurId: " + livreurId + ", DateLivraison: " + dateLivraison + ", adresse: " + adresse);
+            Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
             try
             {
                 var commande = await _context.Commandes
@@ -140,7 +142,7 @@ namespace GESTIONCOMMANDES.Controllers
                 commande.EtatCommande = StatutCommande.PRET_A_LIVRER;
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Livraison planifiée avec succès.";
-                return RedirectToAction(nameof(Details), new { id = commandeId });
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
@@ -154,6 +156,15 @@ namespace GESTIONCOMMANDES.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Paiement(int commandeId, TypePaiement typePaiement, string reference)
         {
+            Console.WriteLine("---------------------------------------------------------------------------------------------");
+            Console.WriteLine("CommandeId: " + commandeId + ", TypePaiement: " + typePaiement + ", Reference: " + reference);
+            Console.WriteLine("---------------------------------------------------------------------------------------------");
+            if (commandeId <= 0 || string.IsNullOrWhiteSpace(reference))
+            {
+                TempData["ErrorMessage"] = "Informations de paiement invalides.";
+                return RedirectToAction(nameof(Details), new { id = commandeId });
+            }
+
             try
             {
                 var commande = await _context.Commandes
@@ -165,31 +176,34 @@ namespace GESTIONCOMMANDES.Controllers
                     return RedirectToAction(nameof(Details), new { id = commandeId });
                 }
 
-                // Mettez à jour l'état de la commande en fonction du type de paiement
+                // Mettre à jour les états de la commande
                 commande.EtatCommande = StatutCommande.LIVREE;
                 commande.StatutPaiement = StatutPaiement.PAYEE;
 
-                // Enregistrez les informations du paiement (référence et mode)
+                // Ajouter un nouveau paiement
                 var paiement = new Paiement
                 {
                     CommandeId = commande.Id,
                     TypePaiement = typePaiement,
-                    Reference = reference,  // Vérifiez que la référence est correctement récupérée
+                    Reference = reference,
                     Date = DateTime.UtcNow
                 };
 
-                _context.Paiements.Add(paiement);
+                await _context.Paiements.AddAsync(paiement);
                 await _context.SaveChangesAsync();
+                Console.WriteLine("Données recu: " + reference + " " + typePaiement);
 
                 TempData["SuccessMessage"] = "Paiement effectué avec succès.";
-                return RedirectToAction(nameof(Details), new { id = commandeId });
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Une erreur s'est produite : {ex.Message}";
+                Console.WriteLine($"Une erreur s'est produite lors du paiement : {ex.Message}");
+                TempData["ErrorMessage"] = "Une erreur s'est produite lors du paiement.";
                 return RedirectToAction(nameof(Details), new { id = commandeId });
             }
         }
+
 
         // GET: Commande/Edit/5
         public async Task<IActionResult> Edit(int? id)

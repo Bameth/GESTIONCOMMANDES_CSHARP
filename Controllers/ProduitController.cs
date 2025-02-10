@@ -17,7 +17,7 @@ namespace GESTIONCOMMANDES.Controllers
         private readonly AppDbContext _context;
         private readonly IProduitService _produitService;
         private readonly IWebHostEnvironment _environment;
-        private const int PageSize = 4;
+        private const int PageSize = 6;
 
 
 
@@ -110,11 +110,12 @@ namespace GESTIONCOMMANDES.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProduitDto produitDto)
+        public async Task<IActionResult> Create(ProduitDto produitDto, List<IFormFile> AdditionalImages)
         {
-            if (produitDto.ImageFile == null || produitDto.ImageFile.Length == 0)
+            if (produitDto.Description.Length > 500)
             {
-                ModelState.AddModelError("ImageFile", "Veuillez sélectionner une image.");
+                ModelState.AddModelError("Description", "La description ne doit pas dépasser 500 caractères.");
+                return View(produitDto);
             }
 
             if (!ModelState.IsValid)
@@ -122,30 +123,41 @@ namespace GESTIONCOMMANDES.Controllers
                 return View(produitDto);
             }
 
-            string newFileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}{Path.GetExtension(produitDto.ImageFile.FileName)}";
-
             string uploadsFolder = Path.Combine(_environment.WebRootPath, "produits");
             Directory.CreateDirectory(uploadsFolder);
 
-            string filePath = Path.Combine(uploadsFolder, newFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            string mainImageFileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{produitDto.ImageFile.FileName}";
+            string mainFilePath = Path.Combine(uploadsFolder, mainImageFileName);
+            using (var stream = new FileStream(mainFilePath, FileMode.Create))
             {
                 await produitDto.ImageFile.CopyToAsync(stream);
             }
 
-            // Création du produit
+            var additionalImagePaths = new List<string>();
+            foreach (var image in AdditionalImages)
+            {
+                if (image.Length > 0)
+                {
+                    string fileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{image.FileName}";
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+                    additionalImagePaths.Add(fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+                }
+            }
+
             var produit = new Produit
             {
                 Libelle = produitDto.Libelle,
                 Prix = produitDto.Prix,
                 QteStock = produitDto.QteStock,
-                ImageFileName = newFileName,
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
+                ImageFileName = mainImageFileName,
+                Description = produitDto.Description,
+                Images = additionalImagePaths
             };
-
-            produit.EtatProduit();
 
             _context.Produits.Add(produit);
             await _context.SaveChangesAsync();
@@ -153,7 +165,35 @@ namespace GESTIONCOMMANDES.Controllers
             return RedirectToAction(nameof(Liste));
         }
 
-        // GET: Produit/Edit/5
+        // GET: Produit/ApplyDiscount/5
+        public async Task<IActionResult> ApplyDiscount(int id)
+        {
+            var produit = await _context.Produits.FindAsync(id);
+            if (produit == null)
+            {
+                return NotFound();
+            }
+            return View(produit);
+        }
+
+        // POST: Produit/ApplyDiscount/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApplyDiscount(int id, decimal pourcentageSolde)
+        {
+            var produit = await _context.Produits.FindAsync(id);
+            if (produit == null)
+            {
+                return NotFound();
+            }
+
+            produit.PourcentageSolde = pourcentageSolde;
+            _context.Update(produit);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+         // GET: Produit/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -170,38 +210,72 @@ namespace GESTIONCOMMANDES.Controllers
         }
 
         // POST: Produit/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Libelle,Prix,QteStock,Id,CreateAt,UpdateAt")] Produit produit)
+        public async Task<IActionResult> Edit(int id, ProduitDto produitDto, IFormFile? ImageFile, List<IFormFile>? AdditionalImages)
         {
-            if (id != produit.Id)
-            {
-                return NotFound();
-            }
+
 
             if (ModelState.IsValid)
             {
-                try
+                var produit = await _context.Produits.FindAsync(id);
+                if (produit == null)
                 {
-                    _context.Update(produit);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+
+                // Mise à jour des propriétés du produit
+                produit.Libelle = produitDto.Libelle;
+                produit.Prix = produitDto.Prix;
+                produit.QteStock = produitDto.QteStock;
+                produit.Description = produitDto.Description;
+
+                // Gestion de l'image principale
+                if (ImageFile != null)
                 {
-                    if (!ProduitExists(produit.Id))
+                    string uploadsFolder = Path.Combine(_environment.WebRootPath, "produits");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    if (!string.IsNullOrEmpty(produit.ImageFileName))
                     {
-                        return NotFound();
+                        string oldImagePath = Path.Combine(uploadsFolder, produit.ImageFileName);
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
                     }
-                    else
+
+                    string fileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{ImageFile.FileName}";
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        throw;
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    produit.ImageFileName = fileName;
+                }
+
+                // Gestion des images supplémentaires
+                if (AdditionalImages != null && AdditionalImages.Count <= 4)
+                {
+                    produit.Images.Clear(); // Réinitialisation des images existantes
+
+                    foreach (var additionalImage in AdditionalImages)
+                    {
+                        string additionalImageFileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{additionalImage.FileName}";
+                        string additionalImagePath = Path.Combine(_environment.WebRootPath, "produits", additionalImageFileName);
+                        using (var stream = new FileStream(additionalImagePath, FileMode.Create))
+                        {
+                            await additionalImage.CopyToAsync(stream);
+                        }
+                        produit.Images.Add(additionalImageFileName);
                     }
                 }
+
+                _context.Update(produit);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(produit);
+            return View(produitDto);
         }
 
         // GET: Produit/Delete/5
@@ -234,7 +308,7 @@ namespace GESTIONCOMMANDES.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Liste));
         }
 
         private bool ProduitExists(int id)

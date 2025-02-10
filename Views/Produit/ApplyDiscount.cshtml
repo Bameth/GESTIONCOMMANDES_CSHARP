@@ -1,0 +1,64 @@
+@model GESTIONCOMMANDES.Models.Entities.Produit
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Appliquer une Solde";
+}
+
+<div class="bg-gradient-to-br from-indigo-300 min-h-screen py-6">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-3xl p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 tracking-tight">Appliquer une Solde</h2>
+            <p class="text-lg text-gray-600 mt-2">Mettez à jour le pourcentage de solde pour le produit.</p>
+        </div>
+
+        <!-- Formulaire -->
+        <form asp-action="ApplyDiscount" method="post" class="space-y-6">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Libelle" class="block text-lg font-semibold text-gray-700">Libellé du produit</label>
+                <input asp-for="Libelle" class="form-control mt-2 p-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="pourcentageSolde" class="block text-lg font-semibold text-gray-700">Pourcentage de Solde (%)</label>
+                <input type="number" id="pourcentageSolde" name="pourcentageSolde" class="form-control mt-2 p-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" min="0" max="100" required />
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-indigo-600 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition-all duration-300">
+                Appliquer
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- CSS personnalisé -->
+<style>
+    .form-control:focus {
+        border-color: #6366F1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-primary {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 1.125rem;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+    }
+
+    .form-group label {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #333;
+    }
+</style>

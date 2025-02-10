@@ -1,0 +1,140 @@
+🏢 Projet C# : Gestion des Commandes pour l'entreprise NSA
+
+🔍 Description du projet
+
+Ce projet a pour objectif de faciliter la gestion des commandes, du stock, des livraisons et de la facturation pour l'entreprise NSA. Il s'agit d'une application web moderne utilisant l'architecture ASP.NET MVC, offrant des interfaces intuitives et une gestion efficace des processus suivants :
+
+👨‍👩‍👦 Enregistrement des commandes par les clients
+
+🔧 Gestion des produits et du stock par le Responsable de Stock (RS)
+
+🚚 Suivi des livraisons et facturation par le Comptable
+
+💳 Gestion des paiements et des remises
+
+🔄 Suivi des états des commandes par les clients
+
+✨ Fonctionnalités principales
+
+👨‍👩‍👦 Client :
+
+✉ Créer un compte avec vérification d'identité via email.
+
+📅 Enregistrer des commandes et suivre leur état.
+
+📥 Déclarer une commande comme livrée et enregistrer le paiement associé (type, montant, référence).
+
+📊 Bénéficier de remises pour 10 commandes effectuées en un mois.
+
+🔧 Responsable de Stock (RS) :
+
+📝 Gérer les produits (ajout, mise à jour du stock, gestion des seuils).
+
+🚒 Préparer les commandes pour livraison.
+
+📆 Planifier les livraisons en sélectionnant les livreurs disponibles.
+
+💼 Comptable :
+
+📄 Établir et imprimer des factures.
+
+🔢 Lister les commandes à livrer ou payées.
+
+🔹 Suivre l'historique des versements clients.
+
+🔄 Consulter les statistiques de commandes, livraisons et paiements quotidiens.
+
+⚙️ Caractéristiques techniques
+
+💪 Backend
+
+Technologie principale : ASP.NET MVC
+
+Base de données : PostgreSQL pour un stockage sécurisé et performant des données.
+
+🔒 Authentification et sécurité : Identity Framework permettant une gestion robuste des utilisateurs et des rôles (Client, RS, Comptable).
+
+✉ Gestion des emails : Envoi automatique d’emails de confirmation et de vérification d’identité lors de l’inscription.
+
+📢 Gestion des SMS : Intégration de Twilio pour informer les clients sur l’état de leurs commandes ou pour des alertes importantes.
+
+🕸️ Frontend
+
+Technologie principale : HTML, JavaScript.
+
+Framework CSS : Tailwind CSS pour une conception réactive, moderne et attrayante des interfaces utilisateur.
+
+🔄 Architecture
+
+Architecture par couche pour une séparation claire des responsabilités.
+
+Utilisation de l'Inversion de Contrôle et de l'Injection de Dépendances pour une extensibilité accrue.
+
+📈 ORM
+
+Entity Framework avec approche Modèle-First pour la gestion des données.
+
+Utilisation du langage LINQ pour des requêtes complexes.
+
+🔢 Diagrammes UML
+
+Les diagrammes suivants ont été réalisés pour modéliser le projet :
+
+🎨 Diagramme de cas d'utilisation pour chaque rôle (Client, RS, Comptable).
+
+🔰 Diagramme de classe intégrant les relations entre les entités avec des design patterns.
+
+🔐 Diagrammes de séquence pour les fonctionnalités principales (exemple : validation de commande, gestion des livraisons).
+
+🏦 Diagramme d'architecture pour représenter les interactions entre les couches.
+
+🔬 Statistiques gérées par l'application
+
+✅ Nombre de commandes du jour.
+
+✅ Nombre de livraisons effectuées dans la journée.
+
+✅ Montant total des paiements reçus dans la journée.
+
+❌ Commandes mises en attente.
+
+📖 Instructions d'installation
+
+Prérequis
+
+Visual Studio 2022 (ou version ultérieure).
+
+PostgreSQL (base de données).
+
+Compte Twilio pour l'envoi de SMS.
+
+Serveur de messagerie configuré (ex. : SMTP).
+
+✍️ Étapes
+
+Clonez le dépôt du projet :
+
+git clone https://github.com/Bameth/GESTIONCOMMANDES_CSHARP.git
+
+Configurez la chaîne de connexion PostgreSQL dans appsettings.json.
+
+Configurez les identifiants Twilio et les paramètres SMTP.
+
+Exécutez les migrations Entity Framework pour créer la base de données :
+
+dotnet ef database update
+
+Lancez l'application en mode débogage via Visual Studio.
+
+📢 Contributions
+
+Les contributions sont les bienvenues. Si vous souhaitez signaler un problème ou proposer une amélioration, veuillez ouvrir une issue ou créer une pull request.
+
+🔧 Auteur
+
+Ce projet a été conçu et développé par [Votre Nom] dans le cadre de la gestion des processus de l’entreprise NSA.
+
+✉ Licence
+
+Ce projet est sous licence MIT. Veuillez consulter le fichier LICENSE pour plus d'informations.
+

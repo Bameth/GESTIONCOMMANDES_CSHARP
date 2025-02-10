@@ -21,15 +21,18 @@ namespace GESTIONCOMMANDES.Controllers
         {
             if (TempData.Peek("PanierId") != null)
             {
-                using (var panier = new Panier(_context, TempData.Peek("PanierId").ToString()))
-                {
-                    var lignes = panier.Lignes();
-                    ViewBag.Total = panier.TotalPanier();
-                    return View(lignes);
-                }
+                var panier = new Panier(_context, TempData.Peek("PanierId").ToString());
+                var lignes = panier.Lignes();
+                ViewBag.Total = panier.TotalPanier();
+                ViewBag.PanierVide = !lignes.Any();
+                return View(lignes);
             }
+
+            ViewBag.PanierVide = true;
             return View(new List<LignePanier>());
         }
+
+
 
         // Ajouter un produit au panier
         public IActionResult Ajouter(int produitId)
@@ -89,7 +92,7 @@ namespace GESTIONCOMMANDES.Controllers
             var lignePanier = _context.LignePanier.SingleOrDefault(l => l.Id == ligneId);
 
             if (lignePanier == null)
-                return RedirectToAction("Index");
+                return Json(new { success = false, message = "Ligne introuvable." });
 
             lignePanier.Quantite += increment;
 
@@ -104,12 +107,19 @@ namespace GESTIONCOMMANDES.Controllers
 
             _context.SaveChanges();
 
-            return RedirectToAction("Index");
+            var total = _context.LignePanier
+                .Where(l => l.PanierId == lignePanier.PanierId)
+                .Sum(l => l.Produit.Prix * l.Quantite);
+
+            var isEmpty = !_context.LignePanier.Any(l => l.PanierId == lignePanier.PanierId);
+
+            return Json(new
+            {
+                success = true,
+                newQuantity = lignePanier.Quantite,
+                total = total,
+                isEmpty = isEmpty
+            });
         }
-
-
-
     }
-
-
 }

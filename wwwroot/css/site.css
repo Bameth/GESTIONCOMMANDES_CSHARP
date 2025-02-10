@@ -1,0 +1,32 @@
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Navbar */
+        nav {
+            z-index: 1000;
+        }
+
+        /* Animation du menu utilisateur */
+        #userMenu {
+            display: none;
+        }
+
+        #userMenu.show {
+            display: block;
+        }
+
+        .navbar-item {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .navbar-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-header {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            height: 5px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }

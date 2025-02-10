@@ -4,47 +4,53 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="container mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">Créer un Produit</h1>
+    <h4 class="text-lg text-gray-500 mb-4 text-center">Veuillez remplir les détails du produit</h4>
+    <hr class="mb-6 border-gray-300">
 
-<h4>Produit</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Libelle" class="control-label"></label>
-                <input asp-for="Libelle" class="form-control" />
-                <span asp-validation-for="Libelle" class="text-danger"></span>
+    <div class="max-w-2xl mx-auto">
+        <form asp-action="Create" enctype="multipart/form-data" class="space-y-6">
+            <div class="flex flex-col">
+                <label asp-for="Libelle" class="block text-sm font-semibold text-gray-700 mb-1">Libellé</label>
+                <input asp-for="Libelle" placeholder="Nom du produit" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2" />
             </div>
-            <div class="form-group">
-                <label asp-for="Prix" class="control-label"></label>
-                <input asp-for="Prix" class="form-control" />
-                <span asp-validation-for="Prix" class="text-danger"></span>
+            <div class="flex flex-col">
+                <label asp-for="Prix" class="block text-sm font-semibold text-gray-700 mb-1">Prix</label>
+                <input asp-for="Prix" type="number" placeholder="Prix en FCFA" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2" />
             </div>
-            <div class="form-group">
-                <label asp-for="QteStock" class="control-label"></label>
-                <input asp-for="QteStock" class="form-control" />
-                <span asp-validation-for="QteStock" class="text-danger"></span>
+            <div class="flex flex-col">
+                <label asp-for="QteStock" class="block text-sm font-semibold text-gray-700 mb-1">Quantité en Stock</label>
+                <input asp-for="QteStock" type="number" placeholder="Quantité disponible" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2" />
             </div>
-            <div class="form-group">
-                <label class="control-label">Image</label>
-                <input asp-for="ImageFile" type="file" class="form-control" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            <div class="flex flex-col">
+                <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                <textarea asp-for="Description" rows="4" placeholder="Description détaillée du produit" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2"></textarea>
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="flex flex-col">
+                <label for="ImageFile" class="block text-sm font-semibold text-gray-700 mb-1">Image Principale</label>
+                <input asp-for="ImageFile" type="file" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2 bg-gray-50" />
+            </div>
+            <div class="flex flex-col">
+                <label for="AdditionalImages" class="block text-sm font-semibold text-gray-700 mb-1">Autres Images</label>
+                <input name="AdditionalImages" type="file" multiple class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 px-4 py-2 bg-gray-50" />
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Créer le Produit
+                </button>
             </div>
         </form>
     </div>
+
+    <div class="mt-8 text-center">
+        <a asp-action="Liste" class="text-indigo-600 hover:underline text-sm font-medium">← Retour à la liste des produits</a>
+    </div>
 </div>
 
-<div>
-    <a asp-action="Liste">Back to List</a>
-</div>
 <script>
     const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         const imageInput = document.querySelector('input[type="file"]');
         if (!imageInput.files.length) {
             alert('Veuillez sélectionner une image.');

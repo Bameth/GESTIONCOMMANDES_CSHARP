@@ -42,54 +42,97 @@ namespace GESTIONCOMMANDES.Models.Entities
                 throw new InvalidOperationException("Le panier est vide.");
             }
 
-            var client = _context.Clients.FirstOrDefault(c => c.User.UserName == userName);
-            if (client == null)
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
             {
-                throw new InvalidOperationException("Client introuvable pour cet utilisateur.");
-            }
-
-            var lignePaniers = _context.LignePanier
-                .Where(s => s.PanierId == _panierId)
-                .Include(l => l.Produit)
-                .ToList();
-
-            if (!lignePaniers.Any())
-            {
-                throw new InvalidOperationException("Impossible de récupérer les articles du panier.");
-            }
-
-            var commande = new Commande
-            {
-                UserName = userName,
-                Date = DateTime.UtcNow,
-                EtatCommande = StatutCommande.ENCOURS,
-                MontantTotal = TotalPanier(),
-                ClientId = client.Id
-            };
-
-            _context.Commandes.Add(commande);
-            _context.SaveChanges();
-
-            foreach (var ligne in lignePaniers)
-            {
-                var detailCommande = new DetailCommande
+                var client = _context.Clients.FirstOrDefault(c => c.User.UserName == userName);
+                if (client == null)
                 {
-                    CommandeId = commande.Id,
-                    ProduitId = ligne.ProduitId,
-                    Prix = ligne.Produit.Prix,
-                    QuantiteCmd = ligne.Quantite,
-                    Montant = ligne.Montant()
+                    throw new InvalidOperationException("Client introuvable pour cet utilisateur.");
+                }
+
+                var lignePaniers = _context.LignePanier
+                    .Where(s => s.PanierId == _panierId)
+                    .Include(l => l.Produit)
+                    .ToList();
+
+                if (!lignePaniers.Any())
+                {
+                    throw new InvalidOperationException("Impossible de récupérer les articles du panier.");
+                }
+
+                foreach (var ligne in lignePaniers)
+                {
+                    if (ligne.Produit.QteStock < ligne.Quantite)
+                    {
+                        throw new InvalidOperationException($"Le produit {ligne.Produit.Libelle} n'a pas assez de stock disponible.");
+                    }
+                }
+
+                var commande = new Commande
+                {
+                    UserName = userName,
+                    Date = DateTime.UtcNow,
+                    EtatCommande = StatutCommande.ENCOURS,
+                    MontantTotal = TotalPanier(),
+                    ClientId = client.Id
                 };
 
-                _context.DetailCommandes.Add(detailCommande);
+                var nombreCommandes = GetNombreCommandesDansLeMois(client.Id).Result;
+                commande.MontantTotal = CalculerMontantAvecRemise(commande, nombreCommandes);
+
+                _context.Commandes.Add(commande);
+                _context.SaveChanges();
+
+                foreach (var ligne in lignePaniers)
+                {
+                    var detailCommande = new DetailCommande
+                    {
+                        CommandeId = commande.Id,
+                        ProduitId = ligne.ProduitId,
+                        Prix = ligne.Produit.Prix,
+                        QuantiteCmd = ligne.Quantite,
+                        Montant = ligne.Montant()
+                    };
+
+                    _context.DetailCommandes.Add(detailCommande);
+
+                    ligne.Produit.QteStock -= ligne.Quantite;
+                    _context.Produits.Update(ligne.Produit);
+                }
+
+                _context.SaveChanges();
+
+                ViderPanier();
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new InvalidOperationException($"Une erreur est survenue lors de la validation de la commande : {ex.Message}");
+            }
+        }
+        private async Task<int> GetNombreCommandesDansLeMois(int clientId)
+        {
+            var dateDebutMois = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var nombreCommandes = await _context.Commandes
+                .Where(c => c.ClientId == clientId && c.Date >= dateDebutMois)
+                .CountAsync();
+
+            return nombreCommandes;
+        }
+        private static decimal CalculerMontantAvecRemise(Commande commande, int nombreCommandes)
+        {
+            const decimal remise = 0.10m;
+            if (nombreCommandes >= 10)
+            {
+                return commande.MontantTotal * (1 - remise);
             }
 
-            _context.SaveChanges();
-
-            ViderPanier();
+            return commande.MontantTotal;
         }
-
-
         public void ViderPanier()
         {
             var lignePaniers = _context.LignePanier
@@ -126,11 +169,14 @@ namespace GESTIONCOMMANDES.Models.Entities
         public decimal TotalPanier()
         {
             var lignes = _context.LignePanier
-            .Where(s => s.PanierId == _panierId)
-            .Include(l => l.Produit)
-            .ToList();
+                .Where(s => s.PanierId == _panierId)
+                .Include(l => l.Produit)
+                .ToList();
 
-            decimal total = lignes.Sum(l => l.Montant());
+            decimal total = lignes.Sum(l => l.Produit.PourcentageSolde.HasValue
+                ? l.Quantite * l.Produit.PrixSolde
+                : l.Quantite * l.Produit.Prix);
+
             return total;
         }
         public void MigrerPanier(string userName)

@@ -4,48 +4,82 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<!-- Main content container -->
+<div class="min-h-screen bg-gradient-to-r from-blue-50 via-indigo-50 to-indigo-100 flex items-center justify-center py-12">
+    <!-- Card container with soft shadows and rounded corners -->
+    <div class="bg-white shadow-xl rounded-3xl max-w-4xl w-full p-8 transform hover:scale-105 transition-transform duration-500 ease-in-out">
+        <!-- Title section with soft fonts and color contrast -->
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-extrabold text-gray-800">Delete Produit</h1>
+            <h3 class="text-xl text-gray-600 mt-2">Are you sure you want to delete this product?</h3>
+        </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Produit</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Libelle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Libelle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Prix)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Prix)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.QteStock)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.QteStock)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdateAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdateAt)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        <!-- Product details section -->
+        <div class="space-y-6">
+            <h4 class="text-2xl font-semibold text-gray-800">Produit Details</h4>
+            <hr class="border-t-2 border-gray-300" />
+
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-600">Libelle</dt>
+                    <dd class="text-lg text-gray-800">@Html.DisplayFor(model => model.Libelle)</dd>
+                </div>
+                <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-600">Prix</dt>
+                    <dd class="text-lg text-gray-800">@Html.DisplayFor(model => model.Prix) FCFA</dd>
+                </div>
+                <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-600">Quantité en Stock</dt>
+                    <dd class="text-lg text-gray-800">@Html.DisplayFor(model => model.QteStock)</dd>
+                </div>
+                <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-600">Créé le</dt>
+                    <dd class="text-lg text-gray-800">@Html.DisplayFor(model => model.CreateAt)</dd>
+                </div>
+                <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-600">Mis à jour le</dt>
+                    <dd class="text-lg text-gray-800">@Html.DisplayFor(model => model.UpdateAt)</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="mt-8 flex justify-between items-center">
+            <button onclick="openDeleteModal()"
+                class="bg-red-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transform transition-all duration-300 ease-in-out hover:scale-105">
+                <i class="fas fa-trash-alt mr-2"></i> Delete
+            </button>
+            <a asp-action="Liste" class="text-indigo-600 font-semibold hover:underline hover:text-indigo-800 transform transition-all duration-300 ease-in-out">
+                <i class="fas fa-arrow-left mr-2"></i> Back to List
+            </a>
+        </div>
+    </div>
 </div>
+
+<!-- Modal for confirmation -->
+<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
+        <h2 class="text-2xl font-semibold text-gray-800">Confirm Deletion</h2>
+        <p class="mt-4 text-gray-600">Are you sure you want to delete <span class="font-bold">@Model.Libelle</span>? This action cannot be undone.</p>
+        <div class="mt-6 flex justify-end space-x-4">
+            <button onclick="closeDeleteModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded font-semibold hover:bg-gray-300">Cancel</button>
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded font-semibold hover:bg-red-700">Confirm</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script>
+}

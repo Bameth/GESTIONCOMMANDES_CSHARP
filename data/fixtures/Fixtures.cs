@@ -98,12 +98,14 @@ namespace GESTIONCOMMANDES.data.fixtures
                     Libelle = "Produit A",
                     Prix = 500,
                     QteStock = 100,
+                    Description = "Produit de Qualité superior avec une bonne description",
                     ImageFileName = "/produits/20241213000632.jpg"
                 };
                 var produit2 = new Produit
                 {
                     Libelle = "Produit B",
                     Prix = 5000,
+                    Description = "Produit de Qualité superior avec une bonne description",
                     QteStock = 100,
                     ImageFileName = "/produits/20241213000632.jpg"
                 };

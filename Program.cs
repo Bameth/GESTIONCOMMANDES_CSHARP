@@ -1,5 +1,6 @@
 using GESTIONCOMMANDES.data;
 using GESTIONCOMMANDES.data.fixtures;
+using GESTIONCOMMANDES.hub;
 using GESTIONCOMMANDES.Models.Entities;
 using GESTIONCOMMANDES.services;
 using GESTIONCOMMANDES.services.Impl;
@@ -31,6 +32,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 // Register the Fixtures service
 builder.Services.AddScoped<Fixtures>();
 
+
+builder.Services.AddSignalR(); // Ajouter SignalR aux services
+
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -41,6 +46,9 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IProduitService, ProduitService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<SmsService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
@@ -55,6 +63,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<AppDbContext>();
         Fixtures.Initialize(context);
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {
@@ -69,6 +78,18 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseStatusCodePages(context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == 404)
+    {
+        response.Redirect("/Home/NotFoundPage");
+    }
+
+    return Task.CompletedTask;
+});
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -76,6 +97,11 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
+
+app.MapHub<PanierHub>("/panierHub");
+
 
 app.MapControllerRoute(
     name: "default",

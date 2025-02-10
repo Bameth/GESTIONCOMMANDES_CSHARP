@@ -5,6 +5,7 @@ namespace GESTIONCOMMANDES.Models.Entities
         public string Libelle { get; set; }
         public decimal Prix { get; set; }
         public int QteStock { get; set; }
+        public string Description { get; set; }
         public IFormFile? ImageFile { get; set; }
     }
 }
