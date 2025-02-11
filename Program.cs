@@ -9,10 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register the AppDbContext with PostgreSQL connection
+// // Register the AppDbContext with PostgreSQL connection
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+// );
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? 
+                       builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(connectionString)
 );
+
 
 // Register Identity services
 builder.Services.AddIdentity<User, IdentityRole>(options =>
