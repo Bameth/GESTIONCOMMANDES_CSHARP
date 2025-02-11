@@ -1,23 +1,23 @@
-# Étape de build : utiliser le SDK pour compiler et publier l’application
+# Étape 1 : Construire l'application
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# Copier le fichier projet et restaurer les packages
+# Copier le fichier projet et restaurer les dépendances
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copier l’ensemble du projet et publier en Release
+# Copier tout le projet et compiler
 COPY . ./
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish -c Release -o /out
 
-# Étape finale : image runtime plus légère
+# Étape 2 : Utiliser une image plus légère pour exécuter l'application
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish ./
+COPY --from=build /out ./
 
-# Exposer le port 80 (HTTP) et 443 (HTTPS) si besoin
+# Exposer le port
 EXPOSE 80
 EXPOSE 443
 
-# Lancer l’application
+# Démarrer l'application
 ENTRYPOINT ["dotnet", "GESTIONCOMMANDES.dll"]
