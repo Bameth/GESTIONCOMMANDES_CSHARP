@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/home/ameth-ba/projects/GESTIONCOMMANDESCHARP/GESTIONCOMMANDES/GESTIONCOMMANDES.csproj": {}
+    "C:\\Users\\ameth\\OneDrive\\Documents\\GESTIONCOMMANDESCHARP\\GESTIONCOMMANDES\\GESTIONCOMMANDES.csproj": {}
   },
   "projects": {
-    "/home/ameth-ba/projects/GESTIONCOMMANDESCHARP/GESTIONCOMMANDES/GESTIONCOMMANDES.csproj": {
+    "C:\\Users\\ameth\\OneDrive\\Documents\\GESTIONCOMMANDESCHARP\\GESTIONCOMMANDES\\GESTIONCOMMANDES.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/ameth-ba/projects/GESTIONCOMMANDESCHARP/GESTIONCOMMANDES/GESTIONCOMMANDES.csproj",
+        "projectUniqueName": "C:\\Users\\ameth\\OneDrive\\Documents\\GESTIONCOMMANDESCHARP\\GESTIONCOMMANDES\\GESTIONCOMMANDES.csproj",
         "projectName": "GESTIONCOMMANDES",
-        "projectPath": "/home/ameth-ba/projects/GESTIONCOMMANDESCHARP/GESTIONCOMMANDES/GESTIONCOMMANDES.csproj",
-        "packagesPath": "/home/ameth-ba/.nuget/packages/",
-        "outputPath": "/home/ameth-ba/projects/GESTIONCOMMANDESCHARP/GESTIONCOMMANDES/obj/",
+        "projectPath": "C:\\Users\\ameth\\OneDrive\\Documents\\GESTIONCOMMANDESCHARP\\GESTIONCOMMANDES\\GESTIONCOMMANDES.csproj",
+        "packagesPath": "C:\\Users\\ameth\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ameth\\OneDrive\\Documents\\GESTIONCOMMANDESCHARP\\GESTIONCOMMANDES\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/ameth-ba/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\ameth\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +44,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -65,7 +73,7 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.1, )"
+              "version": "[9.0.2, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -115,7 +123,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.405/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

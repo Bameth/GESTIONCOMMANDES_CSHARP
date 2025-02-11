@@ -62,14 +62,15 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        Fixtures.Initialize(context);
-        await context.Database.MigrateAsync();
+        await context.Database.MigrateAsync(); // Exécuter uniquement les migrations
+        Fixtures.Initialize(context); // Commenter cette ligne temporairement
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Erreur lors de l'initialisation des fixtures : {ex.Message}");
     }
 }
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
