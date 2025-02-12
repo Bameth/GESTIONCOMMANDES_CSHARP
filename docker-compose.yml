@@ -21,7 +21,7 @@ services:
       - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      -  ConnectionStrings__DefaultConnection=Host=postgres.railway.internal;Port=5432;Database=railway;Username=postgres;Password=BsHrCdlzDhKgfcuwiFIowgzTirHsSToZ;
+      -  ConnectionStrings__DefaultConnection=Host=postgres.railway.internal;Port=5432;Database=railway;Username=postgres;Password=LVZPWoDkhFCWJqussMpmrRAhXTmQvZnM;
     ports:
       - "8080:80"
     restart: always
