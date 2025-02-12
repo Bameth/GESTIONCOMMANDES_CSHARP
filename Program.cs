@@ -6,15 +6,16 @@ using GESTIONCOMMANDES.services;
 using GESTIONCOMMANDES.services.Impl;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register the AppDbContext with PostgreSQL connection
+// Connexion PostgreSQL (Railway)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Register Identity services
+// Gestion des utilisateurs avec Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -29,13 +30,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Register the Fixtures service
+// Enregistrement des services et dépendances
 builder.Services.AddScoped<Fixtures>();
-
-
-builder.Services.AddSignalR(); // Ajouter SignalR aux services
-
-
+builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -49,61 +46,70 @@ builder.Services.AddScoped<IProduitService, ProduitService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<SmsService>();
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// Activer l'accès au HttpContext
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Charger les fixtures
+// Activer les en-têtes proxy pour Railway
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// Charger les migrations (mais pas les fixtures en production)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        await context.Database.MigrateAsync(); // Exécuter uniquement les migrations
-        Fixtures.Initialize(context); // Commenter cette ligne temporairement
+        await context.Database.MigrateAsync(); // Appliquer les migrations
+        if (app.Environment.IsDevelopment()) // Ne charger les fixtures qu'en mode dev
+        {
+            Fixtures.Initialize(context);
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Erreur lors de l'initialisation des fixtures : {ex.Message}");
+        Console.WriteLine($"Erreur lors de l'initialisation de la base : {ex.Message}");
     }
 }
 
-
-// Configure the HTTP request pipeline.
+// Gestion des erreurs et de la redirection HTTPS
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// Désactiver la redirection HTTPS en production (Railway force HTTPS)
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+app.UseSession();
+
+// Gestion des erreurs 404
 app.UseStatusCodePages(context =>
 {
     var response = context.HttpContext.Response;
-
     if (response.StatusCode == 404)
     {
         response.Redirect("/Home/NotFoundPage");
     }
-
     return Task.CompletedTask;
 });
 
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.UseSession();
-
+// Ajout de SignalR
 app.MapHub<PanierHub>("/panierHub");
 
-
+// Configuration des routes MVC
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
