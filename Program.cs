@@ -18,7 +18,7 @@ if (!string.IsNullOrEmpty(databaseUrl))
 {
     var uri = new Uri(databaseUrl);
     var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};";
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true;";
 }
 else
 {
@@ -26,10 +26,8 @@ else
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    // Utilise la chaîne de connexion PostgreSQL provenant de la variable d'environnement ou de la configuration
-    options.UseNpgsql(connectionString);
-});
+    options.UseNpgsql(connectionString));
+
 
 // Gestion des utilisateurs avec Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
