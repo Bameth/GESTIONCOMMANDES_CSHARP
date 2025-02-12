@@ -11,13 +11,25 @@ using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connexion PostgreSQL (Railway)
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+string connectionString;
+
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};";
+}
+else
+{
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString)
-);
-
+{
+    // Utilise la chaîne de connexion PostgreSQL provenant de la variable d'environnement ou de la configuration
+    options.UseNpgsql(connectionString);
+});
 
 // Gestion des utilisateurs avec Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>

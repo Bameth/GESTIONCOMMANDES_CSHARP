@@ -17,14 +17,14 @@ services:
   app:
     build: .
     container_name: gestion_commandes
-    depends_on:
-      - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      -  ConnectionStrings__DefaultConnection=Host=postgres.railway.internal;Port=5432;Database=railway;Username=postgres;Password=LVZPWoDkhFCWJqussMpmrRAhXTmQvZnM;
+      - DATABASE_URL=postgresql://postgres:LVZPWoDkhFCWJqussMpmrRAhXTmQvZnM@postgres.railway.internal:5432/railway
+      - ConnectionStrings__DefaultConnection=Host=postgres.railway.internal;Port=5432;Database=railway;Username=postgres;Password=LVZPWoDkhFCWJqussMpmrRAhXTmQvZnM;
     ports:
       - "8080:80"
     restart: always
+    command: ["sh", "-c", "dotnet ef database update && dotnet run"]
 
   # pgadmin:
   #   image: dpage/pgadmin4
