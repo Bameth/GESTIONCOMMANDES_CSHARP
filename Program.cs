@@ -6,30 +6,15 @@ using GESTIONCOMMANDES.services;
 using GESTIONCOMMANDES.services.Impl;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connexion PostgreSQL (Railway)
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-string connectionString;
-
-if (!string.IsNullOrEmpty(databaseUrl))
-{
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true;";
-}
-else
-{
-    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
-}
-
+// Register the AppDbContext with PostgreSQL connection
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
-
-// Gestion des utilisateurs avec Identity
+// Register Identity services
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -44,9 +29,13 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Enregistrement des services et dépendances
+// Register the Fixtures service
 builder.Services.AddScoped<Fixtures>();
-builder.Services.AddSignalR();
+
+
+builder.Services.AddSignalR(); // Ajouter SignalR aux services
+
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -60,70 +49,61 @@ builder.Services.AddScoped<IProduitService, ProduitService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<SmsService>();
 
-// Activer l'accès au HttpContext
-builder.Services.AddHttpContextAccessor();
+// Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Activer les en-têtes proxy pour Railway
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-// Charger les migrations (mais pas les fixtures en production)
+// Charger les fixtures
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        await context.Database.MigrateAsync(); // Appliquer les migrations
-        if (app.Environment.IsDevelopment()) // Ne charger les fixtures qu'en mode dev
-        {
-            Fixtures.Initialize(context);
-        }
+        var passwordHasher = services.GetRequiredService<IPasswordHasher<User>>();
+        Fixtures.Initialize(context, passwordHasher);
+        await context.Database.MigrateAsync();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Erreur lors de l'initialisation de la base : {ex.Message}");
+        Console.WriteLine($"Erreur lors de l'initialisation des fixtures : {ex.Message}");
     }
 }
 
-// Gestion des erreurs et de la redirection HTTPS
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-// Désactiver la redirection HTTPS en production (Railway force HTTPS)
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthorization();
-app.UseSession();
-
-// Gestion des erreurs 404
 app.UseStatusCodePages(context =>
 {
     var response = context.HttpContext.Response;
+
     if (response.StatusCode == 404)
     {
         response.Redirect("/Home/NotFoundPage");
     }
+
     return Task.CompletedTask;
 });
 
-// Ajout de SignalR
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.UseSession();
+
 app.MapHub<PanierHub>("/panierHub");
 
-// Configuration des routes MVC
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
